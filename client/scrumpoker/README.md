@@ -1,6 +1,6 @@
 # scrumpoker
 
-A new Flutter project.
+scrumpoker client
 
 ## Getting Started
 
