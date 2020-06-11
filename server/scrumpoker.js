@@ -97,30 +97,43 @@ export default async function scrumpoker(ws) {
         [{ memberName: eventData.memberName, vote: 0 }],
       );
       */
-      //if (session.status == "Open") {
-      const member_Id = v4.generate();
 
-      // Create member object
-      memberObj = {
-        id: member_Id,
-        sessionId: eventData.sessionId,
-        members: eventData.memberName, //_addedMember,
-        ws,
-      };
+      if (session.status !== "Closed") {
+        const member_Id = v4.generate();
 
-      membersMap.set(member_Id, memberObj);
+        // Create member object
+        memberObj = {
+          id: member_Id,
+          sessionId: eventData.sessionId,
+          members: eventData.memberName, //_addedMember,
+          ws,
+        };
 
+        membersMap.set(member_Id, memberObj);
+
+        const msg = {
+          type: "newMember",
+          id: memberObj.id,
+          sessionId: memberObj.sessionId,
+          memberName: eventData.memberName,
+          vote: 0,
+        };
+        ws.send(JSON.stringify(msg));
+
+        // Send to original Session -Test this one
+        session.ws.send(JSON.stringify(msg));
+      } else {
+        const msg = {
+          type: "sessionClosed",
+        };
+        ws.send(JSON.stringify(msg));
+      }
+    } // session not found
+    else {
       const msg = {
-        type: "newMember",
-        id: memberObj.id,
-        sessionId: memberObj.sessionId,
-        memberName: eventData.memberName,
-        vote: memberObj.vote,
+        type: "sessionNotFound",
       };
       ws.send(JSON.stringify(msg));
-
-      // Send to original Session -Test this one
-      session.ws.send(JSON.stringify(msg));
     }
   }
 
